@@ -78,8 +78,8 @@
             width: 100%; height: 100%;
             object-fit: cover;
             z-index: 0;
-            filter: grayscale(40%) contrast(125%) brightness(0.5);
-            opacity: 0.8;
+            filter: grayscale(40%) contrast(125%) brightness(0.9); /* Increased brightness */
+            opacity: 1; /* Increased opacity */
             transition: opacity 3s ease-in-out;
         }
 
@@ -344,7 +344,7 @@
             videoElement.currentTime = 0;
             videoElement.play();
             videoElement.classList.remove('fading');
-            videoElement.style.opacity = '0.8'; 
+            videoElement.style.opacity = '1'; /* Updated to match new CSS */
         });
 
         // --- Typewriter Effect Logic ---
