@@ -1,0 +1,618 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width,initial-scale=1" name="viewport">
+    <title>@ry</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        setLogLevel('silent');
+
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        window.fb = {};
+
+        if (firebaseConfig) {
+            const app = initializeApp(firebaseConfig);
+            window.fb.db = getFirestore(app);
+            window.fb.auth = getAuth(app);
+            window.fb.appId = appId;
+        }
+
+        window.initializeAuth = async function() {
+            if (!window.fb.auth) return;
+            try {
+                const auth = window.fb.auth;
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    await signInAnonymously(auth);
+                }
+                window.fb.userId = auth.currentUser?.uid || crypto.randomUUID();
+            } catch (error) {
+                console.error("Auth error:", error);
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #030303;
+            color: #d4d4d4;
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            width: 100vw;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+            margin: 0;
+            cursor: crosshair;
+        }
+        
+        /* Heavier CRT Scanline Overlay */
+        body::after {
+            content: " ";
+            display: block;
+            position: fixed;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(10, 0, 0, 0) 50%, rgba(0, 0, 0, 0.4) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.04), rgba(0, 0, 0, 0.02), rgba(0, 0, 0, 0.04));
+            z-index: 2;
+            background-size: 100% 3px, 3px 100%;
+            pointer-events: none;
+        }
+
+        #intro-video {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            object-fit: cover;
+            z-index: 0;
+            filter: grayscale(40%) contrast(125%) brightness(0.5);
+            opacity: 0.8;
+            transition: opacity 3s ease-in-out;
+        }
+
+        .rain {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .rain-drop {
+            position: absolute;
+            width: 1px; height: 35px;
+            background: rgba(139, 0, 0, 0.5); /* Deeper blood red */
+            opacity: 0;
+            animation: fall linear infinite;
+        }
+        
+        @keyframes fall {
+            0% { transform: translateY(-100%) translateX(0); opacity: 0; }
+            10% { opacity: 0.8; }
+            100% { transform: translateY(100vh) translateX(15px); opacity: 0; }
+        }
+
+        /* Glitch Text Effect */
+        .glow-text {
+            color: #fff;
+            text-shadow: 3px 0 15px rgba(180, 0, 0, 0.9), -3px 0 15px rgba(0, 0, 0, 0.9);
+            position: relative;
+        }
+
+        #username-title {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1.6rem;
+            letter-spacing: 0.15em;
+            margin-bottom: 0.5rem;
+            color: #f5f5f5;
+            text-shadow: 0 0 12px rgba(150, 0, 0, 0.9);
+            text-transform: lowercase;
+        }
+
+        #splash-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: #000;
+            color: #8b0000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            z-index: 999;
+            transition: opacity 1s ease;
+        }
+        
+        #splash-screen h1 {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1.2rem;
+            line-height: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); text-shadow: 0 0 10px rgba(139,0,0,0.8); }
+            50% { opacity: 0.6; transform: scale(0.98); text-shadow: none; }
+        }
+
+        .spark-particle {
+            position: fixed;
+            width: 3px; height: 3px;
+            background-color: #990000;
+            border-radius: 0; /* Sharp sparks */
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 8px 1px rgba(200, 0, 0, 0.8);
+            opacity: 0;
+            z-index: 1000;
+            animation: spark-drift 1s ease-out forwards;
+        }
+
+        @keyframes spark-drift {
+            0% { transform: translate(-50%, -50%) scale(1) rotate(0deg); opacity: 0.9; }
+            100% { transform: translate(calc(-50% + var(--drift-x)), calc(-50% + var(--drift-y))) scale(0) rotate(45deg); opacity: 0; }
+        }
+
+        /* Heavy Goth / Brutalist Window Style */
+        .goth-card {
+            background: #020202; /* Nearly pure black */
+            border: 2px solid #1a0000; /* Outer dark border */
+            box-shadow: 
+                0 0 0 1px #330000, /* Thin red inner stroke */
+                0 30px 80px rgba(0, 0, 0, 0.98), /* Deep drop shadow */
+                inset 0 0 60px rgba(50, 0, 0, 0.2); /* Creepy inner red glow */
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Goth Card Hardware Accents (The corner brackets) */
+        .corner-bracket {
+            position: absolute;
+            width: 24px; height: 24px;
+            border: 2px solid #660000;
+            pointer-events: none;
+            z-index: 11;
+        }
+        .bracket-tl { top: -2px; left: -2px; border-right: none; border-bottom: none; }
+        .bracket-tr { top: -2px; right: -2px; border-left: none; border-bottom: none; }
+        .bracket-bl { bottom: -2px; left: -2px; border-right: none; border-top: none; }
+        .bracket-br { bottom: -2px; right: -2px; border-left: none; border-top: none; }
+
+        #main-content {
+            transition: transform 0.3s ease-out, opacity 1s;
+            transform-style: preserve-3d;
+            transform: perspective(1000px) rotateX(0) rotateY(0);
+        }
+
+        /* Discord link card - more aggressive styling */
+        .link-card {
+            background-color: #070707;
+            border: 1px solid #220000;
+            border-left: 3px solid #550000;
+            transition: all 0.3s ease-in-out;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .link-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 50%; height: 100%;
+            background: linear-gradient(to right, transparent, rgba(139, 0, 0, 0.1), transparent);
+            transform: skewX(-20deg);
+            transition: 0.5s;
+        }
+
+        .link-card:hover::before { left: 150%; }
+
+        .link-card:hover {
+            background-color: #0a0000;
+            transform: translateX(4px); /* Slide right instead of up for an edgy feel */
+            border-color: #660000;
+            border-left: 3px solid #aa0000;
+            box-shadow: -5px 5px 15px rgba(0, 0, 0, 0.8);
+        }
+
+        /* Brutalist Button */
+        .btn-cta {
+            background-color: transparent;
+            color: #cc0000 !important;
+            border: 1px solid #660000;
+            transition: all 0.2s linear;
+            text-transform: uppercase;
+            font-family: 'Share Tech Mono', monospace;
+            letter-spacing: 2px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-cta:hover {
+            background-color: #440000;
+            color: #fff !important;
+            border-color: #aa0000;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.8), 0 0 15px rgba(139,0,0,0.5);
+        }
+
+        .status-dot { box-shadow: 0 0 10px currentColor; }
+        
+        /* Sharp, severe profile picture container */
+        #profile-picture {
+            border: 1px solid #440000;
+            background: #000;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.9), inset 0 0 15px rgba(100,0,0,0.3);
+            /* Removed rounded properties to make it a stark square */
+        }
+    </style>
+</head>
+<body class="lowercase">
+    <div id="cursor-dot"></div>
+    
+    <video id="intro-video" playsinline src="fullscreen.mp4"></video>
+    
+    <div class="rain" id="rain-container"></div>
+    
+    <div id="splash-screen">
+        <h1 class="glow-text font-extrabold sm:text-4xl text-2xl tracking-widest text-center">click to enter</h1>
+    </div>
+
+    <main class="flex items-center w-full duration-1000 min-h-[100dvh] hidden justify-center opacity-0 relative z-10 py-12 overflow-y-auto" id="main-content">
+        
+        <div class="w-[95%] sm:w-full goth-card max-w-md mx-auto p-8 sm:p-10">
+            
+            <div class="corner-bracket bracket-tl"></div>
+            <div class="corner-bracket bracket-tr"></div>
+            <div class="corner-bracket bracket-bl"></div>
+            <div class="corner-bracket bracket-br"></div>
+            
+            <header class="mb-8 text-center">
+                <div class="flex items-center justify-center h-28 mb-6 mx-auto overflow-hidden p-1 w-28 relative" id="profile-picture">
+                    <svg class="w-full h-full p-3 text-red-900" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                </div>
+                <h1 class="mb-2" id="username-title"></h1>
+                <p class="text-gray-500 text-[10px] font-bold tracking-[0.3em] uppercase font-['Share_Tech_Mono']" id="discord-status">SYSTEM OFFLINE</p>
+                <div class="border border-red-900/30 bg-[#050000] text-gray-400 shadow-[inset_0_0_10px_rgba(0,0,0,0.8)] font-['Share_Tech_Mono'] hidden max-w-xs mt-5 mx-auto p-3 text-center text-[10px] tracking-wider" id="discord-activity"></div>
+            </header>
+
+            <div class="h-[1px] w-32 mx-auto mb-8 bg-gradient-to-r from-transparent via-[#8b0000] to-transparent shadow-[0_0_8px_rgba(139,0,0,0.8)]"></div>
+            
+            <section class="mb-10 text-center">
+                <p class="text-gray-500 text-xs font-['Share_Tech_Mono'] tracking-widest uppercase whitespace-pre-wrap">"Wagwan."</p>
+            </section>
+            
+            <section class="select-none space-y-4">
+                <a class="flex items-center flex-col justify-between link-card p-4 sm:flex-row group" href="#" id="discord-server-link" target="_blank">
+                    <div class="flex items-center w-full" id="server-info">
+                        <div class="h-12 w-12 mr-4 bg-black border border-[#330000] overflow-hidden flex-shrink-0 flex items-center justify-center">
+                            <img alt="Server Icon" src="https://placehold.co/64x64/000000/660000?text=DC&font=monospace" class="h-full w-full object-cover filter" id="server-icon" onerror='this.onerror=null,this.src="https://placehold.co/64x64/000000/660000?text=DC"'>
+                        </div>
+                        <div>
+                            <span class="font-bold text-gray-300 font-['Share_Tech_Mono'] text-sm tracking-widest" id="server-name">CONNECTING...</span>
+                            <div class="flex mt-1.5 space-x-4 text-[#555] text-[10px] uppercase font-['Share_Tech_Mono'] tracking-widest">
+                                <span class="flex items-center">
+                                    <span class="w-1.5 h-1.5 bg-[#4a0000] text-[#4a0000] status-dot mr-2 inline-block"></span> 
+                                    ON: <span class="text-[#880000] ml-1" id="online-members">0</span> 
+                                </span>
+                                <span class="flex items-center">
+                                    <span class="w-1.5 h-1.5 bg-[#222] mr-2 inline-block"></span> 
+                                    ALL: <span class="ml-1 text-[#444]" id="total-members">0</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="font-bold btn-cta mt-4 px-6 py-2.5 sm:ml-4 sm:mt-0 text-[10px]">
+                        JOIN
+                    </div>
+                </a>
+            </section>
+        </div>
+    </main>
+
+    <script>
+        // --- CONFIGURATION ---
+        const DISCORD_USER_ID = '1489745660998586529'; 
+        const DISCORD_INVITE_CODE = 'ZnyWkebDkP'; 
+
+        // --- Video Fade Control Logic ---
+        const videoElement = document.getElementById('intro-video');
+        
+        videoElement.addEventListener('timeupdate', () => {
+            // Fade out exactly 3 seconds before the end
+            if (videoElement.duration - videoElement.currentTime <= 3 && !videoElement.classList.contains('fading')) {
+                videoElement.classList.add('fading');
+                videoElement.style.opacity = '0';
+            }
+        });
+
+        videoElement.addEventListener('ended', () => {
+            // Loop restart and fade back in
+            videoElement.currentTime = 0;
+            videoElement.play();
+            videoElement.classList.remove('fading');
+            videoElement.style.opacity = '0.8'; 
+        });
+
+        // --- Typewriter Effect Logic ---
+        const DISPLAY_SEQUENCE = ['@', '@r', '@ry', '@r']; 
+        const TYPING_SPEED = 140; // Slightly slower, eerier pacing
+        const DELETING_SPEED = 70;
+        const PAUSE_TIME = 1200;
+
+        let sequenceIndex = 0;
+        let charIndex = 0;
+        let h1Element;
+        let titleElement;
+
+        function typeWriterLoop() {
+            if (!h1Element) h1Element = document.getElementById('username-title');
+            if (!titleElement) titleElement = document.getElementsByTagName('title')[0];
+
+            const targetText = DISPLAY_SEQUENCE[sequenceIndex];
+            const isTyping = targetText.length > charIndex;
+            const isPausing = targetText.length === charIndex;
+            const isDeleting = targetText.length < charIndex;
+            let currentDelay = isTyping ? TYPING_SPEED : DELETING_SPEED;
+
+            if (isPausing) {
+                let delay = PAUSE_TIME; 
+                if (targetText === '') delay = PAUSE_TIME * 1.5;
+                sequenceIndex = (sequenceIndex + 1) % DISPLAY_SEQUENCE.length;
+                setTimeout(typeWriterLoop, delay);
+                return;
+            }
+
+            if (isTyping) charIndex++;
+            else if (isDeleting) charIndex--;
+
+            const currentDisplay = targetText.substring(0, charIndex);
+            
+            // Terminal block cursor
+            if (h1Element) h1Element.innerHTML = currentDisplay + '<span class="text-[#8b0000] animate-pulse">_</span>'; 
+            titleElement.textContent = currentDisplay || '...';
+
+            setTimeout(typeWriterLoop, currentDelay);
+        }
+
+        // --- Lanyard API Fetch ---
+        function updateDiscordPresence(data) {
+            const statusEl = document.getElementById('discord-status');
+            const activityEl = document.getElementById('discord-activity');
+            const pfpContainer = document.getElementById('profile-picture');
+                
+            if (!data || data.error) {
+                statusEl.textContent = 'DATA UNAVAILABLE';
+                activityEl.classList.add('hidden');
+                return;
+            }
+
+            const { discord_status, activities, discord_user } = data.data;
+
+            let statusText = 'OFFLINE';
+            let statusColor = 'text-[#444]';
+
+            // Changed colors to fit the dark red/goth theme instead of standard bright colors
+            switch (discord_status) {
+                case 'online':
+                    statusText = 'ONLINE';
+                    statusColor = 'text-[#8b0000]'; 
+                    break;
+                case 'idle':
+                    statusText = 'IDLE';
+                    statusColor = 'text-[#8b4500]';  
+                    break;
+                case 'dnd':
+                    statusText = 'DO NOT DISTURB';
+                    statusColor = 'text-[#cc0000]'; 
+                    break;
+            }
+
+            statusEl.className = `text-[10px] font-bold uppercase tracking-[0.3em] font-['Share_Tech_Mono'] ${statusColor}`;
+            statusEl.innerHTML = `<span class="w-1.5 h-1.5 inline-block bg-current status-dot mr-2 align-middle mb-0.5"></span>${statusText} // discord: ${discord_user.username}`;
+
+            if (discord_user && discord_user.avatar) {
+                const avatarUrl = `https://cdn.discordapp.com/avatars/${discord_user.id}/${discord_user.avatar}.png?size=256`;
+                // Applied grayscale and contrast filters to make the avatar fit the aesthetic
+                pfpContainer.innerHTML = `<img id="pfp-img" src="${avatarUrl}" alt="User Avatar" class="w-full h-full object-cover filter contrast-150 brightness-75" onerror="this.onerror=null;this.src='https://placehold.co/128x128/000/330000?text=ERR';">`;
+            }
+
+            const gamingActivity = activities.find(a => a.type === 0);
+            const listeningActivity = activities.find(a => a.type === 2);
+                
+            activityEl.innerHTML = '';
+                
+            if (gamingActivity) {
+                activityEl.classList.remove('hidden');
+                activityEl.innerHTML = `<span class="text-[#8b0000]">> EXE:</span> ${gamingActivity.name}`;
+            } else if (listeningActivity) {
+                activityEl.classList.remove('hidden');
+                activityEl.innerHTML = `<span class="text-[#8b0000]">> AUDIO:</span> ${listeningActivity.details || listeningActivity.name}`;
+            } else {
+                activityEl.classList.add('hidden');
+            }
+        }
+
+        async function fetchLanyardData() {
+            try {
+                const response = await fetch(`https://api.lanyard.rest/v1/users/${DISCORD_USER_ID}`);
+                const data = await response.json();
+                updateDiscordPresence(data);
+            } catch (error) {
+                console.error('Lanyard fetch error:', error);
+            }
+        }
+
+        function initializeLanyard() {
+            fetchLanyardData();
+            setInterval(fetchLanyardData, 10000);
+        }
+
+        // --- Discord Server API ---
+        async function fetchDiscordServerData() {
+            const serverNameEl = document.getElementById('server-name');
+            const onlineMembersEl = document.getElementById('online-members');
+            const totalMembersEl = document.getElementById('total-members');
+            const serverIconEl = document.getElementById('server-icon');
+            const serverLinkEl = document.getElementById('discord-server-link');
+                
+            const apiUrl = `https://discord.com/api/v8/invites/${DISCORD_INVITE_CODE}?with_counts=true`;
+
+            try {
+                const response = await fetch(apiUrl);
+                if (!response.ok) throw new Error('Failed to fetch Discord server invite data.');
+
+                const data = await response.json();
+                const guild = data.guild;
+
+                serverNameEl.textContent = guild.name || 'UNKNOWN ZONE';
+                onlineMembersEl.textContent = (data.approximate_presence_count || 0).toLocaleString();
+                totalMembersEl.textContent = (data.approximate_member_count || 0).toLocaleString();
+
+                if (guild.icon) {
+                    const iconUrl = `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.png?size=128`;
+                    serverIconEl.src = iconUrl;
+                    serverIconEl.onerror = () => serverIconEl.src = "https://placehold.co/64x64/000/330000?text=DC";
+                }
+                    
+                serverLinkEl.href = `https://discord.gg/${DISCORD_INVITE_CODE}`;
+
+            } catch (error) {
+                console.error("Error fetching Discord invite data:", error);
+                serverNameEl.textContent = 'SERVER_ERROR';
+                serverLinkEl.href = `https://discord.gg/${DISCORD_INVITE_CODE}`; 
+            }
+        }
+
+        // --- Rain/Static Effect ---
+        function initializeRainEffect() {
+            const container = document.getElementById('rain-container');
+            const density = 60; 
+
+            for (let i = 0; i < density; i++) {
+                const drop = document.createElement('div');
+                drop.classList.add('rain-drop');
+
+                const x = Math.random() * 100 + 'vw';
+                const y = Math.random() * 100 + 'vh';
+                const duration = Math.random() * 0.4 + 0.1 + 's'; 
+                const delay = Math.random() * 2 + 's';
+                const size = Math.random() * 2 + 1;
+
+                drop.style.left = x;
+                drop.style.top = y;
+                drop.style.width = size + 'px';
+                drop.style.height = (Math.random() * 50 + 20) + 'px';
+                drop.style.animationDuration = duration;
+                drop.style.animationDelay = delay;
+
+                container.appendChild(drop);
+            }
+        }
+
+        // --- Custom Cursor Spark Effect ---
+        const particleContainer = document.getElementById('cursor-dot');
+        particleContainer.style.width = '0';
+        particleContainer.style.height = '0';
+
+        let lastMoveTime = 0;
+        const EMIT_INTERVAL = 50; 
+
+        function createSparkParticle(x, y) {
+            const spark = document.createElement('div');
+            spark.classList.add('spark-particle');
+                
+            spark.style.left = x + 'px';
+            spark.style.top = y + 'px';
+                
+            const driftX = Math.floor(Math.random() * 120) - 60; 
+            const driftY = Math.floor(Math.random() * 120) - 60; 
+                
+            spark.style.setProperty('--drift-x', `${driftX}px`);
+            spark.style.setProperty('--drift-y', `${driftY}px`);
+                
+            particleContainer.appendChild(spark);
+                
+            setTimeout(() => { spark.remove(); }, 1000); 
+        }
+
+        document.addEventListener('mousemove', (e) => {
+            const currentTime = Date.now();
+            if (currentTime - lastMoveTime < EMIT_INTERVAL) return;
+            lastMoveTime = currentTime;
+            createSparkParticle(e.clientX, e.clientY);
+        });
+
+        // --- Parallax Tilt Effect ---
+        const tiltElement = document.getElementById('main-content');
+        const MAX_TILT = 3; // Reduced tilt for a heavier feel
+
+        document.addEventListener('mousemove', (e) => {
+            if (tiltElement.classList.contains('hidden')) return;
+
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+
+            const centerX = width / 2;
+            const centerY = height / 2;
+
+            const mouseX = e.clientX - centerX;
+            const mouseY = e.clientY - centerY;
+
+            const percentX = (mouseX / centerX) * 100;
+            const percentY = (mouseY / centerY) * 100;
+
+            const rotateX = -(percentY / 100) * MAX_TILT; 
+            const rotateY = (percentX / 100) * MAX_TILT;
+
+            tiltElement.style.transform = `perspective(1500px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+        });
+
+        document.addEventListener('mouseleave', () => {
+            tiltElement.style.transform = 'perspective(1500px) rotateX(0deg) rotateY(0deg)';
+        });
+
+        // --- Splash Screen Init ---
+        document.getElementById('splash-screen').addEventListener('click', async function() {
+            const splash = this;
+            const content = document.getElementById('main-content');
+
+            videoElement.play().catch(e => console.warn("Video autoplay failed:", e));
+
+            initializeLanyard();    
+            fetchDiscordServerData();   
+                
+            if (window.initializeAuth) {
+                await window.initializeAuth();
+            }
+                
+            initializeRainEffect();
+            typeWriterLoop();
+
+            splash.style.opacity = '0';
+
+            setTimeout(() => {
+                splash.classList.add('hidden');
+                splash.remove();    
+                content.classList.remove('hidden');
+                setTimeout(() => {
+                    content.style.opacity = '1';
+                }, 50);
+            }, 800); 
+        });
+    </script>
+</body>
+</html>
