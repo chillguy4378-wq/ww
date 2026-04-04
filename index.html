@@ -46,6 +46,15 @@
     </script>
 
     <style>
+        /* HIDE SCROLLBARS */
+        ::-webkit-scrollbar {
+            display: none;
+        }
+        html, body {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+
         body {
             background-color: #030303;
             color: #d4d4d4;
@@ -58,15 +67,17 @@
             overflow-x: hidden;
             margin: 0;
             cursor: crosshair;
+            /* FNAF Vignette effect */
+            box-shadow: inset 0 0 150px rgba(0,0,0,0.95);
         }
         
-        /* Heavier CRT Scanline Overlay */
+        /* CRT Scanline Overlay */
         body::after {
             content: " ";
             display: block;
             position: fixed;
             top: 0; left: 0; bottom: 0; right: 0;
-            background: linear-gradient(rgba(10, 0, 0, 0) 50%, rgba(0, 0, 0, 0.4) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.04), rgba(0, 0, 0, 0.02), rgba(0, 0, 0, 0.04));
+            background: linear-gradient(rgba(10, 0, 0, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.02), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.02));
             z-index: 2;
             background-size: 100% 3px, 3px 100%;
             pointer-events: none;
@@ -78,36 +89,39 @@
             width: 100%; height: 100%;
             object-fit: cover;
             z-index: 0;
-            filter: grayscale(40%) contrast(125%) brightness(0.9); /* Increased brightness */
-            opacity: 1; /* Increased opacity */
+            /* Made background brighter and easier to see */
+            filter: grayscale(20%) contrast(110%) brightness(0.8);
+            opacity: 1;
             transition: opacity 3s ease-in-out;
         }
 
+        /* FNAF Static / VHS Tracking Lines */
         .rain {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             pointer-events: none;
             z-index: 1;
+            mix-blend-mode: screen;
         }
         
         .rain-drop {
             position: absolute;
-            width: 1px; height: 35px;
-            background: rgba(139, 0, 0, 0.5); /* Deeper blood red */
+            width: 100vw; height: 2px;
+            background: rgba(255, 255, 255, 0.05); 
             opacity: 0;
-            animation: fall linear infinite;
+            animation: vhs-track linear infinite;
         }
         
-        @keyframes fall {
-            0% { transform: translateY(-100%) translateX(0); opacity: 0; }
-            10% { opacity: 0.8; }
-            100% { transform: translateY(100vh) translateX(15px); opacity: 0; }
+        @keyframes vhs-track {
+            0% { transform: translateY(-100%); opacity: 0; }
+            50% { opacity: 0.8; }
+            100% { transform: translateY(100vh); opacity: 0; }
         }
 
         /* Glitch Text Effect */
         .glow-text {
             color: #fff;
-            text-shadow: 3px 0 15px rgba(180, 0, 0, 0.9), -3px 0 15px rgba(0, 0, 0, 0.9);
+            text-shadow: 3px 0 10px rgba(200, 200, 200, 0.9), -3px 0 10px rgba(0, 0, 0, 0.9);
             position: relative;
         }
 
@@ -117,7 +131,7 @@
             letter-spacing: 0.15em;
             margin-bottom: 0.5rem;
             color: #f5f5f5;
-            text-shadow: 0 0 12px rgba(150, 0, 0, 0.9);
+            text-shadow: 0 0 12px rgba(255, 255, 255, 0.5);
             text-transform: lowercase;
         }
 
@@ -125,7 +139,7 @@
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             background-color: #000;
-            color: #8b0000;
+            color: #fff;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -144,18 +158,18 @@
         }
 
         @keyframes pulse {
-            0%, 100% { opacity: 1; transform: scale(1); text-shadow: 0 0 10px rgba(139,0,0,0.8); }
+            0%, 100% { opacity: 1; transform: scale(1); text-shadow: 0 0 10px rgba(255,255,255,0.8); }
             50% { opacity: 0.6; transform: scale(0.98); text-shadow: none; }
         }
 
         .spark-particle {
             position: fixed;
             width: 3px; height: 3px;
-            background-color: #990000;
-            border-radius: 0; /* Sharp sparks */
+            background-color: #ffffff;
+            border-radius: 0; 
             pointer-events: none;
             transform: translate(-50%, -50%);
-            box-shadow: 0 0 8px 1px rgba(200, 0, 0, 0.8);
+            box-shadow: 0 0 8px 1px rgba(255, 255, 255, 0.8);
             opacity: 0;
             z-index: 1000;
             animation: spark-drift 1s ease-out forwards;
@@ -166,23 +180,24 @@
             100% { transform: translate(calc(-50% + var(--drift-x)), calc(-50% + var(--drift-y))) scale(0) rotate(45deg); opacity: 0; }
         }
 
-        /* Heavy Goth / Brutalist Window Style */
-        .goth-card {
-            background: #020202; /* Nearly pure black */
-            border: 2px solid #1a0000; /* Outer dark border */
+        /* Transparent Profile Card (See background through it) */
+        .fnaf-card {
+            background: rgba(10, 10, 10, 0.4); /* Translucent */
+            backdrop-filter: blur(4px); /* Glass effect */
+            border: 2px solid rgba(184, 153, 71, 0.3); /* Dirty gold FNAF border */
             box-shadow: 
-                0 0 0 1px #330000, /* Thin red inner stroke */
-                0 30px 80px rgba(0, 0, 0, 0.98), /* Deep drop shadow */
-                inset 0 0 60px rgba(50, 0, 0, 0.2); /* Creepy inner red glow */
+                0 0 0 1px rgba(0, 0, 0, 0.8), 
+                0 30px 80px rgba(0, 0, 0, 0.7),
+                inset 0 0 40px rgba(0, 0, 0, 0.6); 
             position: relative;
             z-index: 10;
         }
 
-        /* Goth Card Hardware Accents (The corner brackets) */
+        /* Card Hardware Accents */
         .corner-bracket {
             position: absolute;
             width: 24px; height: 24px;
-            border: 2px solid #660000;
+            border: 2px solid rgba(184, 153, 71, 0.6); /* Dirty Gold */
             pointer-events: none;
             z-index: 11;
         }
@@ -197,14 +212,15 @@
             transform: perspective(1000px) rotateX(0) rotateY(0);
         }
 
-        /* Discord link card - more aggressive styling */
+        /* Link card */
         .link-card {
-            background-color: #070707;
-            border: 1px solid #220000;
-            border-left: 3px solid #550000;
+            background-color: rgba(5, 5, 5, 0.5);
+            border: 1px solid rgba(50, 50, 50, 0.5);
+            border-left: 3px solid #b89947; /* Dirty gold */
             transition: all 0.3s ease-in-out;
             position: relative;
             overflow: hidden;
+            backdrop-filter: blur(2px);
         }
         
         .link-card::before {
@@ -212,7 +228,7 @@
             position: absolute;
             top: 0; left: -100%;
             width: 50%; height: 100%;
-            background: linear-gradient(to right, transparent, rgba(139, 0, 0, 0.1), transparent);
+            background: linear-gradient(to right, transparent, rgba(184, 153, 71, 0.1), transparent);
             transform: skewX(-20deg);
             transition: 0.5s;
         }
@@ -220,18 +236,17 @@
         .link-card:hover::before { left: 150%; }
 
         .link-card:hover {
-            background-color: #0a0000;
-            transform: translateX(4px); /* Slide right instead of up for an edgy feel */
-            border-color: #660000;
-            border-left: 3px solid #aa0000;
+            background-color: rgba(20, 20, 20, 0.7);
+            transform: translateX(4px); 
+            border-color: #66552b;
+            border-left: 3px solid #dfc375;
             box-shadow: -5px 5px 15px rgba(0, 0, 0, 0.8);
         }
 
-        /* Brutalist Button */
         .btn-cta {
             background-color: transparent;
-            color: #cc0000 !important;
-            border: 1px solid #660000;
+            color: #b89947 !important;
+            border: 1px solid #66552b;
             transition: all 0.2s linear;
             text-transform: uppercase;
             font-family: 'Share Tech Mono', monospace;
@@ -241,24 +256,39 @@
         }
         
         .btn-cta:hover {
-            background-color: #440000;
+            background-color: rgba(184, 153, 71, 0.2);
             color: #fff !important;
-            border-color: #aa0000;
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.8), 0 0 15px rgba(139,0,0,0.5);
+            border-color: #b89947;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.8), 0 0 15px rgba(184, 153, 71, 0.3);
         }
 
         .status-dot { box-shadow: 0 0 10px currentColor; }
         
-        /* Sharp, severe profile picture container */
         #profile-picture {
-            border: 1px solid #440000;
-            background: #000;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.9), inset 0 0 15px rgba(100,0,0,0.3);
-            /* Removed rounded properties to make it a stark square */
+            border: 1px solid rgba(184, 153, 71, 0.5);
+            background: rgba(0, 0, 0, 0.5); /* Let video show through behind pfp if it's transparent */
+            box-shadow: 0 10px 25px rgba(0,0,0,0.9), inset 0 0 15px rgba(0,0,0,0.5);
+        }
+
+        /* FNAF Security Camera Overlay */
+        .fnaf-overlay-text {
+            font-family: 'Share Tech Mono', monospace;
+            color: white;
+            text-shadow: 1px 1px 2px black;
+            z-index: 50;
+            pointer-events: none;
         }
     </style>
 </head>
 <body class="lowercase">
+    
+    <div class="fixed top-6 left-8 text-2xl flex items-center fnaf-overlay-text opacity-90 hidden" id="rec-indicator">
+        <div class="w-4 h-4 bg-red-600 rounded-full animate-pulse mr-3 shadow-[0_0_8px_red]"></div> REC
+    </div>
+    <div class="fixed top-6 right-8 text-2xl fnaf-overlay-text opacity-90 hidden" id="cam-indicator">
+        CAM 01
+    </div>
+
     <div id="cursor-dot"></div>
     
     <video id="intro-video" playsinline src="fullscreen.mp4"></video>
@@ -266,12 +296,12 @@
     <div class="rain" id="rain-container"></div>
     
     <div id="splash-screen">
-        <h1 class="glow-text font-extrabold sm:text-4xl text-2xl tracking-widest text-center">click to enter</h1>
+        <h1 class="glow-text font-extrabold sm:text-4xl text-2xl tracking-widest text-center">SIGNAL LOST<br><span class="text-sm mt-4 block text-gray-400">click to reboot</span></h1>
     </div>
 
     <main class="flex items-center w-full duration-1000 min-h-[100dvh] hidden justify-center opacity-0 relative z-10 py-12 overflow-y-auto" id="main-content">
         
-        <div class="w-[95%] sm:w-full goth-card max-w-md mx-auto p-8 sm:p-10">
+        <div class="w-[95%] sm:w-full fnaf-card max-w-md mx-auto p-8 sm:p-10">
             
             <div class="corner-bracket bracket-tl"></div>
             <div class="corner-bracket bracket-tr"></div>
@@ -280,37 +310,37 @@
             
             <header class="mb-8 text-center">
                 <div class="flex items-center justify-center h-28 mb-6 mx-auto overflow-hidden p-1 w-28 relative" id="profile-picture">
-                    <svg class="w-full h-full p-3 text-red-900" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <svg class="w-full h-full p-3 text-[#b89947]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                     </svg>
                 </div>
                 <h1 class="mb-2" id="username-title"></h1>
-                <p class="text-gray-500 text-[10px] font-bold tracking-[0.3em] uppercase font-['Share_Tech_Mono']" id="discord-status">SYSTEM OFFLINE</p>
-                <div class="border border-red-900/30 bg-[#050000] text-gray-400 shadow-[inset_0_0_10px_rgba(0,0,0,0.8)] font-['Share_Tech_Mono'] hidden max-w-xs mt-5 mx-auto p-3 text-center text-[10px] tracking-wider" id="discord-activity"></div>
+                <p class="text-gray-400 text-[10px] font-bold tracking-[0.3em] uppercase font-['Share_Tech_Mono']" id="discord-status">SYSTEM OFFLINE</p>
+                <div class="border border-[#b89947]/30 bg-[rgba(0,0,0,0.6)] text-gray-300 shadow-[inset_0_0_10px_rgba(0,0,0,0.8)] font-['Share_Tech_Mono'] hidden max-w-xs mt-5 mx-auto p-3 text-center text-[10px] tracking-wider" id="discord-activity"></div>
             </header>
 
-            <div class="h-[1px] w-32 mx-auto mb-8 bg-gradient-to-r from-transparent via-[#8b0000] to-transparent shadow-[0_0_8px_rgba(139,0,0,0.8)]"></div>
+            <div class="h-[1px] w-32 mx-auto mb-8 bg-gradient-to-r from-transparent via-[#b89947] to-transparent shadow-[0_0_8px_rgba(184,153,71,0.5)]"></div>
             
             <section class="mb-10 text-center">
-                <p class="text-gray-500 text-xs font-['Share_Tech_Mono'] tracking-widest uppercase whitespace-pre-wrap">"Wagwan."</p>
+                <p class="text-gray-300 text-xs font-['Share_Tech_Mono'] tracking-widest uppercase whitespace-pre-wrap">"Wagwan."</p>
             </section>
             
             <section class="select-none space-y-4">
                 <a class="flex items-center flex-col justify-between link-card p-4 sm:flex-row group" href="#" id="discord-server-link" target="_blank">
                     <div class="flex items-center w-full" id="server-info">
-                        <div class="h-12 w-12 mr-4 bg-black border border-[#330000] overflow-hidden flex-shrink-0 flex items-center justify-center">
-                            <img alt="Server Icon" src="https://placehold.co/64x64/000000/660000?text=DC&font=monospace" class="h-full w-full object-cover filter" id="server-icon" onerror='this.onerror=null,this.src="https://placehold.co/64x64/000000/660000?text=DC"'>
+                        <div class="h-12 w-12 mr-4 bg-black border border-[#66552b] overflow-hidden flex-shrink-0 flex items-center justify-center">
+                            <img alt="Server Icon" src="https://placehold.co/64x64/000000/b89947?text=DC&font=monospace" class="h-full w-full object-cover" id="server-icon" onerror='this.onerror=null,this.src="https://placehold.co/64x64/000000/b89947?text=DC"'>
                         </div>
                         <div>
-                            <span class="font-bold text-gray-300 font-['Share_Tech_Mono'] text-sm tracking-widest" id="server-name">CONNECTING...</span>
-                            <div class="flex mt-1.5 space-x-4 text-[#555] text-[10px] uppercase font-['Share_Tech_Mono'] tracking-widest">
+                            <span class="font-bold text-gray-200 font-['Share_Tech_Mono'] text-sm tracking-widest" id="server-name">CONNECTING...</span>
+                            <div class="flex mt-1.5 space-x-4 text-[#888] text-[10px] uppercase font-['Share_Tech_Mono'] tracking-widest">
                                 <span class="flex items-center">
-                                    <span class="w-1.5 h-1.5 bg-[#4a0000] text-[#4a0000] status-dot mr-2 inline-block"></span> 
-                                    ON: <span class="text-[#880000] ml-1" id="online-members">0</span> 
+                                    <span class="w-1.5 h-1.5 bg-[#b89947] text-[#b89947] status-dot mr-2 inline-block"></span> 
+                                    ON: <span class="text-[#dfc375] ml-1" id="online-members">0</span> 
                                 </span>
                                 <span class="flex items-center">
-                                    <span class="w-1.5 h-1.5 bg-[#222] mr-2 inline-block"></span> 
-                                    ALL: <span class="ml-1 text-[#444]" id="total-members">0</span>
+                                    <span class="w-1.5 h-1.5 bg-[#444] mr-2 inline-block"></span> 
+                                    ALL: <span class="ml-1 text-[#aaa]" id="total-members">0</span>
                                 </span>
                             </div>
                         </div>
@@ -332,7 +362,6 @@
         const videoElement = document.getElementById('intro-video');
         
         videoElement.addEventListener('timeupdate', () => {
-            // Fade out exactly 3 seconds before the end
             if (videoElement.duration - videoElement.currentTime <= 3 && !videoElement.classList.contains('fading')) {
                 videoElement.classList.add('fading');
                 videoElement.style.opacity = '0';
@@ -340,16 +369,15 @@
         });
 
         videoElement.addEventListener('ended', () => {
-            // Loop restart and fade back in
             videoElement.currentTime = 0;
             videoElement.play();
             videoElement.classList.remove('fading');
-            videoElement.style.opacity = '1'; /* Updated to match new CSS */
+            videoElement.style.opacity = '1'; 
         });
 
         // --- Typewriter Effect Logic ---
         const DISPLAY_SEQUENCE = ['@', '@r', '@ry', '@r']; 
-        const TYPING_SPEED = 140; // Slightly slower, eerier pacing
+        const TYPING_SPEED = 140; 
         const DELETING_SPEED = 70;
         const PAUSE_TIME = 1200;
 
@@ -382,7 +410,7 @@
             const currentDisplay = targetText.substring(0, charIndex);
             
             // Terminal block cursor
-            if (h1Element) h1Element.innerHTML = currentDisplay + '<span class="text-[#8b0000] animate-pulse">_</span>'; 
+            if (h1Element) h1Element.innerHTML = currentDisplay + '<span class="text-[#ffffff] animate-pulse">_</span>'; 
             titleElement.textContent = currentDisplay || '...';
 
             setTimeout(typeWriterLoop, currentDelay);
@@ -403,31 +431,29 @@
             const { discord_status, activities, discord_user } = data.data;
 
             let statusText = 'OFFLINE';
-            let statusColor = 'text-[#444]';
+            let statusColor = 'text-[#666]';
 
-            // Changed colors to fit the dark red/goth theme instead of standard bright colors
             switch (discord_status) {
                 case 'online':
                     statusText = 'ONLINE';
-                    statusColor = 'text-[#8b0000]'; 
+                    statusColor = 'text-[#22c55e]'; // Security Camera Green
                     break;
                 case 'idle':
                     statusText = 'IDLE';
-                    statusColor = 'text-[#8b4500]';  
+                    statusColor = 'text-[#eab308]'; // Warning Yellow
                     break;
                 case 'dnd':
                     statusText = 'DO NOT DISTURB';
-                    statusColor = 'text-[#cc0000]'; 
+                    statusColor = 'text-[#ef4444]'; // Error Red
                     break;
             }
 
             statusEl.className = `text-[10px] font-bold uppercase tracking-[0.3em] font-['Share_Tech_Mono'] ${statusColor}`;
-            statusEl.innerHTML = `<span class="w-1.5 h-1.5 inline-block bg-current status-dot mr-2 align-middle mb-0.5"></span>${statusText} // discord: ${discord_user.username}`;
+            statusEl.innerHTML = `<span class="w-1.5 h-1.5 inline-block bg-current status-dot mr-2 align-middle mb-0.5"></span>${statusText} // user: ${discord_user.username}`;
 
             if (discord_user && discord_user.avatar) {
                 const avatarUrl = `https://cdn.discordapp.com/avatars/${discord_user.id}/${discord_user.avatar}.png?size=256`;
-                // Applied grayscale and contrast filters to make the avatar fit the aesthetic
-                pfpContainer.innerHTML = `<img id="pfp-img" src="${avatarUrl}" alt="User Avatar" class="w-full h-full object-cover filter contrast-150 brightness-75" onerror="this.onerror=null;this.src='https://placehold.co/128x128/000/330000?text=ERR';">`;
+                pfpContainer.innerHTML = `<img id="pfp-img" src="${avatarUrl}" alt="User Avatar" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='https://placehold.co/128x128/000/b89947?text=ERR';">`;
             }
 
             const gamingActivity = activities.find(a => a.type === 0);
@@ -437,10 +463,10 @@
                 
             if (gamingActivity) {
                 activityEl.classList.remove('hidden');
-                activityEl.innerHTML = `<span class="text-[#8b0000]">> EXE:</span> ${gamingActivity.name}`;
+                activityEl.innerHTML = `<span class="text-[#b89947]">> EXE:</span> ${gamingActivity.name}`;
             } else if (listeningActivity) {
                 activityEl.classList.remove('hidden');
-                activityEl.innerHTML = `<span class="text-[#8b0000]">> AUDIO:</span> ${listeningActivity.details || listeningActivity.name}`;
+                activityEl.innerHTML = `<span class="text-[#b89947]">> AUDIO:</span> ${listeningActivity.details || listeningActivity.name}`;
             } else {
                 activityEl.classList.add('hidden');
             }
@@ -485,7 +511,7 @@
                 if (guild.icon) {
                     const iconUrl = `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.png?size=128`;
                     serverIconEl.src = iconUrl;
-                    serverIconEl.onerror = () => serverIconEl.src = "https://placehold.co/64x64/000/330000?text=DC";
+                    serverIconEl.onerror = () => serverIconEl.src = "https://placehold.co/64x64/000/b89947?text=DC";
                 }
                     
                 serverLinkEl.href = `https://discord.gg/${DISCORD_INVITE_CODE}`;
@@ -497,25 +523,20 @@
             }
         }
 
-        // --- Rain/Static Effect ---
+        // --- VHS Static Effect ---
         function initializeRainEffect() {
             const container = document.getElementById('rain-container');
-            const density = 60; 
+            const density = 15; // Fewer lines, but horizontal tracking artifacts
 
             for (let i = 0; i < density; i++) {
                 const drop = document.createElement('div');
                 drop.classList.add('rain-drop');
 
-                const x = Math.random() * 100 + 'vw';
-                const y = Math.random() * 100 + 'vh';
-                const duration = Math.random() * 0.4 + 0.1 + 's'; 
-                const delay = Math.random() * 2 + 's';
-                const size = Math.random() * 2 + 1;
+                const duration = Math.random() * 2 + 1 + 's'; 
+                const delay = Math.random() * 5 + 's';
+                const thickness = Math.random() * 3 + 1;
 
-                drop.style.left = x;
-                drop.style.top = y;
-                drop.style.width = size + 'px';
-                drop.style.height = (Math.random() * 50 + 20) + 'px';
+                drop.style.height = thickness + 'px';
                 drop.style.animationDuration = duration;
                 drop.style.animationDelay = delay;
 
@@ -558,7 +579,7 @@
 
         // --- Parallax Tilt Effect ---
         const tiltElement = document.getElementById('main-content');
-        const MAX_TILT = 3; // Reduced tilt for a heavier feel
+        const MAX_TILT = 3; 
 
         document.addEventListener('mousemove', (e) => {
             if (tiltElement.classList.contains('hidden')) return;
@@ -589,6 +610,10 @@
         document.getElementById('splash-screen').addEventListener('click', async function() {
             const splash = this;
             const content = document.getElementById('main-content');
+            
+            // Show FNAF overlays
+            document.getElementById('rec-indicator').classList.remove('hidden');
+            document.getElementById('cam-indicator').classList.remove('hidden');
 
             videoElement.play().catch(e => console.warn("Video autoplay failed:", e));
 
