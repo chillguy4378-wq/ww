@@ -216,7 +216,7 @@
         .link-card {
             background-color: rgba(5, 5, 5, 0.5);
             border: 1px solid rgba(50, 50, 50, 0.5);
-            border-left: 3px solid #b89947; /* Dirty gold */
+            border-left: 3px solid #630909; /* Dirty gold */
             transition: all 0.3s ease-in-out;
             position: relative;
             overflow: hidden;
@@ -239,14 +239,14 @@
             background-color: rgba(20, 20, 20, 0.7);
             transform: translateX(4px); 
             border-color: #66552b;
-            border-left: 3px solid #dfc375;
+            border-left: 3px solid #630909;
             box-shadow: -5px 5px 15px rgba(0, 0, 0, 0.8);
         }
 
         .btn-cta {
             background-color: transparent;
-            color: #b89947 !important;
-            border: 1px solid #66552b;
+            color: #630909 !important;
+            border: 1px solid #630909;
             transition: all 0.2s linear;
             text-transform: uppercase;
             font-family: 'Share Tech Mono', monospace;
@@ -258,7 +258,7 @@
         .btn-cta:hover {
             background-color: rgba(81,0,0, 0.2);
             color: #fff !important;
-            border-color: #b89947;
+            border-color: #630909;
             box-shadow: inset 0 0 10px rgba(0,0,0,0.8), 0 0 15px rgba(81,0,0, 0.3);
         }
 
@@ -310,16 +310,16 @@
             
             <header class="mb-8 text-center">
                 <div class="flex items-center justify-center h-28 mb-6 mx-auto overflow-hidden p-1 w-28 relative" id="profile-picture">
-                    <svg class="w-full h-full p-3 text-[#b89947]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <svg class="w-full h-full p-3 text-[#630909]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                     </svg>
                 </div>
                 <h1 class="mb-2" id="username-title"></h1>
                 <p class="text-gray-400 text-[10px] font-bold tracking-[0.3em] uppercase font-['Share_Tech_Mono']" id="discord-status">SYSTEM OFFLINE</p>
-                <div class="border border-[#b89947]/30 bg-[rgba(0,0,0,0.6)] text-gray-300 shadow-[inset_0_0_10px_rgba(0,0,0,0.8)] font-['Share_Tech_Mono'] hidden max-w-xs mt-5 mx-auto p-3 text-center text-[10px] tracking-wider" id="discord-activity"></div>
+                <div class="border border-[#630909]/30 bg-[rgba(0,0,0,0.6)] text-gray-300 shadow-[inset_0_0_10px_rgba(0,0,0,0.8)] font-['Share_Tech_Mono'] hidden max-w-xs mt-5 mx-auto p-3 text-center text-[10px] tracking-wider" id="discord-activity"></div>
             </header>
 
-            <div class="h-[1px] w-32 mx-auto mb-8 bg-gradient-to-r from-transparent via-[#b89947] to-transparent shadow-[0_0_8px_rgba(81,0,0,0.5)]"></div>
+            <div class="h-[1px] w-32 mx-auto mb-8 bg-gradient-to-r from-transparent via-[#630909] to-transparent shadow-[0_0_8px_rgba(81,0,0,0.5)]"></div>
             
             <section class="mb-10 text-center">
                 <p class="text-gray-300 text-xs font-['Share_Tech_Mono'] tracking-widest uppercase whitespace-pre-wrap">"Wagwan."</p>
@@ -328,15 +328,15 @@
             <section class="select-none space-y-4">
                 <a class="flex items-center flex-col justify-between link-card p-4 sm:flex-row group" href="#" id="discord-server-link" target="_blank">
                     <div class="flex items-center w-full" id="server-info">
-                        <div class="h-12 w-12 mr-4 bg-black border border-[#66552b] overflow-hidden flex-shrink-0 flex items-center justify-center">
+                        <div class="h-12 w-12 mr-4 bg-black border border-[#630909] overflow-hidden flex-shrink-0 flex items-center justify-center">
                             <img alt="Server Icon" src="https://placehold.co/64x64/000000/b89947?text=DC&font=monospace" class="h-full w-full object-cover" id="server-icon" onerror='this.onerror=null,this.src="https://placehold.co/64x64/000000/b89947?text=DC"'>
                         </div>
                         <div>
                             <span class="font-bold text-gray-200 font-['Share_Tech_Mono'] text-sm tracking-widest" id="server-name">CONNECTING...</span>
                             <div class="flex mt-1.5 space-x-4 text-[#888] text-[10px] uppercase font-['Share_Tech_Mono'] tracking-widest">
                                 <span class="flex items-center">
-                                    <span class="w-1.5 h-1.5 bg-[#b89947] text-[#b89947] status-dot mr-2 inline-block"></span> 
-                                    ON: <span class="text-[#dfc375] ml-1" id="online-members">0</span> 
+                                    <span class="w-1.5 h-1.5 bg-[#630909] text-[#630909] status-dot mr-2 inline-block"></span> 
+                                    ON: <span class="text-[#630909] ml-1" id="online-members">0</span> 
                                 </span>
                                 <span class="flex items-center">
                                     <span class="w-1.5 h-1.5 bg-[#444] mr-2 inline-block"></span> 
@@ -463,10 +463,10 @@
                 
             if (gamingActivity) {
                 activityEl.classList.remove('hidden');
-                activityEl.innerHTML = `<span class="text-[#b89947]">> EXE:</span> ${gamingActivity.name}`;
+                activityEl.innerHTML = `<span class="text-[#630909]">> EXE:</span> ${gamingActivity.name}`;
             } else if (listeningActivity) {
                 activityEl.classList.remove('hidden');
-                activityEl.innerHTML = `<span class="text-[#b89947]">> AUDIO:</span> ${listeningActivity.details || listeningActivity.name}`;
+                activityEl.innerHTML = `<span class="text-[#630909]">> AUDIO:</span> ${listeningActivity.details || listeningActivity.name}`;
             } else {
                 activityEl.classList.add('hidden');
             }
