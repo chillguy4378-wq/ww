@@ -380,7 +380,7 @@
         const TYPING_SPEED = 140; 
         const DELETING_SPEED = 70;
         const PAUSE_TIME = 1200;
-
+        const VIDEO = document.getElementById('intro-video');
         let sequenceIndex = 0;
         let charIndex = 0;
         let h1Element;
@@ -638,6 +638,7 @@
                 }, 50);
             }, 800); 
         });
+        VIDEO.volume = 0.5;
     </script>
 </body>
 </html>
